@@ -6,7 +6,7 @@ import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveC
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
-import type { TariffSnapshot } from "@/lib/tariffs";
+import { DEFAULT_TARIFFS, type TariffSnapshot } from "@/lib/tariffs";
 import { calculate, formatInput, parseMoney, type Category, type Operation } from "@/lib/calculator";
 import { scrollFocusedInputIntoView } from "@/lib/scroll-focused-input";
 
@@ -260,7 +260,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                     <details className="mt-5 rounded-xl bg-white/65 px-3 py-2.5 sm:px-4">
                       <summary className="cursor-pointer text-sm font-semibold text-[#647184]">Подробности расчёта</summary>
                       <div className="mt-3 space-y-3 border-t border-[#26364A]/10 pt-3 text-sm leading-relaxed">
-                        {result.rate === 0 && result.fixed > 0 ? <p>Стоимость объекта <span className="whitespace-nowrap">{money(parseMoney(price)!)}</span> попадает в диапазон тарифа, в котором предусмотрена только фиксированная комиссия. Поэтому комиссия составляет <span className="whitespace-nowrap">{money(result.fixed)}</span>, без процентной части.</p> : result.fixed > 0 && <p>Фиксированная часть: <span className="whitespace-nowrap">{money(result.fixed)}</span></p>}
+                        {result.rate === 0 && result.fixed > 0 ? <p>Размер агентского вознаграждения при стоимости объекта недвижимости {(() => { const rule = (tariffs?.rules ?? DEFAULT_TARIFFS.rules).find(item => item.operation === operation && item.category === category && parseMoney(price) !== null && parseMoney(price)! >= item.from && (item.to === null || parseMoney(price)! <= item.to)); return rule?.to !== null && rule?.to !== undefined ? `до ${numberFormat.format(Math.floor(rule.to) + 1)}` : "по данному тарифу"; })()} рублей составляет <span className="whitespace-nowrap">{money(result.fixed)}</span>.</p> : result.fixed > 0 && <p>Фиксированная часть: <span className="whitespace-nowrap">{money(result.fixed)}</span></p>}
                         {result.rate > 0 && <p>Процентная часть: <span className="whitespace-nowrap">{money(result.base)}</span> × {numberFormat.format(result.rate * 100)}% = <span className="whitespace-nowrap">{money(result.percent)}</span></p>}
                         {(result.fixed > 0 && result.rate > 0) && <p>Комиссия без скидки: <span className="whitespace-nowrap">{money(result.fixed)}</span> + <span className="whitespace-nowrap">{money(result.percent)}</span> = <span className="whitespace-nowrap">{money(result.calculated)}</span></p>}
                         {result.minimumApplied && <p className="font-semibold">Применена минимальная комиссия: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
