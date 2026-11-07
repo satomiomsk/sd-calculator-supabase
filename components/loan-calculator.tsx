@@ -56,6 +56,7 @@ export function LoanCalculator() {
   const edit = (patch: Partial<LoanDraft>) => update({ ...patch, changed: true, error: "" });
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    if (!term.trim() && value.trim() && rate.trim()) { update({ error: "Введите срок кредита", result: null }); return; }
     if (!value.trim() || !term.trim()) { update({ error: "Заполните поля", result: null }); return; }
     if (!rate.trim()) { update({ error: "Введите ставку", result: null }); return; }
     if (parse(rate) > 30) { update({ error: "Кажется, с процентами немного перебор. С такой ставкой кредит лучше не брать 🙂", result: null }); return; }
