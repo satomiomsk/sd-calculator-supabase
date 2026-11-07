@@ -264,7 +264,6 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                         {result.rate > 0 && <p>Процентная часть: <span className="whitespace-nowrap">{money(result.base)}</span> × {numberFormat.format(result.rate * 100)}% = <span className="whitespace-nowrap">{money(result.percent)}</span></p>}
                         {(result.fixed > 0 && result.rate > 0) && <p>Комиссия без скидки: <span className="whitespace-nowrap">{money(result.fixed)}</span> + <span className="whitespace-nowrap">{money(result.percent)}</span> = <span className="whitespace-nowrap">{money(result.calculated)}</span></p>}
                         {result.minimumApplied && (category === "country" ? <p className="font-semibold">Применено минимальное агентское вознаграждение - 60 000 рублей</p> : <p className="font-semibold">Применена минимальная комиссия: <span className="whitespace-nowrap">{money(result.total)}</span></p>)}
-                        {!result.minimumApplied && result.calculated !== result.total && <p className="text-xs text-[#647184]">Комиссия после округления: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
                         {discount && discounted && (discount.paired ? <>
                           <div className="border-t border-[#26364A]/10 pt-3">
                             <p>Скидка по текущей сделке 3%: <span className="whitespace-nowrap">{money(result.total)}</span> × 3% = <span className="whitespace-nowrap">{money(pairedDiscounted?.currentSaving ?? 0)}</span></p>
