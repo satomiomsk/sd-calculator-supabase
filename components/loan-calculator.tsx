@@ -61,7 +61,7 @@ export function LoanCalculator() {
     if (!rate.trim()) { update({ error: "Введите ставку", result: null }); return; }
     if (parse(rate) > 30) { update({ error: "Кажется, с процентами немного перебор. С такой ставкой кредит лучше не брать 🙂", result: null }); return; }
     try {
-      const months = parse(term) * (unit === "years" ? 12 : 1);
+      const months = unit === "years" ? Math.round(parse(term) * 12) : parse(term);
       const calculation = reverse ? calculateLoanFromPayment(parse(value), months, parse(rate)) : calculateLoan(parse(value), months, parse(rate));
       update({ result: calculation, error: "", changed: false, calculated: true });
     } catch (error) { update({ error: error instanceof Error ? error.message : "Проверьте параметры кредита.", result: null }); }
@@ -79,7 +79,7 @@ export function LoanCalculator() {
       return;
     }
     try {
-      const months = parse(current.term) * (current.unit === "years" ? 12 : 1);
+      const months = current.unit === "years" ? Math.round(parse(current.term) * 12) : parse(current.term);
       const calculation = mode === "payment"
         ? calculateLoanFromPayment(parse(current.value), months, parse(current.rate))
         : calculateLoan(parse(current.value), months, parse(current.rate));
@@ -155,14 +155,25 @@ export function LoanCalculator() {
           edit({ value: formatInput(raw) });
         }} placeholder={reverse ? "Введите платёж" : "Введите сумму"} className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">₽</span></div></div>
         <div><label htmlFor="loan-term" className="mb-3 block text-sm font-semibold">Срок кредита</label><div className="flex gap-2"><input id="loan-term" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} onClick={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={term} onChange={event => {
-          const raw = event.target.value.replace(/[^\d]/g, "").slice(0, unit === "years" ? 2 : 3);
+          const normalized = event.target.value.replace(",", ".");
+          const raw = unit === "years"
+            ? normalized.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1").replace(/^(\d{0,2})(?:\.(\d{0,2})?)?.*$/, (_, whole, fraction) => whole + (fraction !== undefined ? "." + fraction : ""))
+            : normalized.replace(/[^\d]/g, "").slice(0, 3);
           const limit = unit === "years" ? 30 : 360;
           if (raw !== "" && Number(raw) > limit) {
             if (unit === "years") update({ error: "30 лет - наш предел. На более долгий срок кредит пока не выдают 😄" });
             return;
           }
           edit({ term: raw });
-        }} placeholder="Введите срок" className={inputStyle} /><select aria-label="Единицы срока кредита" value={unit} onChange={event => edit({ unit: event.target.value })} className="h-14 shrink-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-3 text-sm outline-none focus:ring-2 focus:ring-[#E83C35]"><option value="years">лет</option><option value="months">месяцев</option></select></div></div>
+        }} placeholder="Введите срок" className={inputStyle} /><select aria-label="Единицы срока кредита" value={unit} onChange={event => {
+          const nextUnit = event.target.value;
+          if (nextUnit === unit) return;
+          const numericTerm = term.trim() ? parse(term) : NaN;
+          const converted = Number.isFinite(numericTerm)
+            ? nextUnit === "years" ? (numericTerm / 12).toFixed(2).replace(/\.0+$|(?<=\.[0-9])0$/, "").replace(/\.$/, "") : String(Math.round(numericTerm * 12))
+            : "";
+          edit({ unit: nextUnit, term: converted });
+        }} className="h-14 shrink-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-3 text-sm outline-none focus:ring-2 focus:ring-[#E83C35]"><option value="years">лет</option><option value="months">месяцев</option></select></div></div>
         <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} onClick={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={rate} onChange={event => {
           const raw = event.target.value.replace(",", ".").replace(/[^\d.]/g, "");
           const parts = raw.split(".");
