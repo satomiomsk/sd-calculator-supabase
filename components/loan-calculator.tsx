@@ -167,8 +167,9 @@ export function LoanCalculator() {
           const parts = raw.split(".");
           const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
           const numeric = Number(candidate);
-          if (candidate !== "" && Number.isFinite(numeric) && numeric > 30) return;
-          update({ rate: candidate, changed: true, error: "" });
+          const integerPart = candidate.split(".")[0];
+          if (integerPart.length > 2 || (candidate !== "" && Number.isFinite(numeric) && numeric > 99)) return;
+          update({ rate: candidate, changed: true, error: candidate !== "" && Number.isFinite(numeric) && numeric > 30 ? "Кажется, с процентами немного перебор. С такой ставкой кредит лучше не брать 🙂" : "" });
         }} placeholder="Годовая ставка" className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">%</span></div></div>
       </div>
       {error && <p role="alert" className="mt-4 text-sm leading-relaxed text-[#BD302A]">{error}</p>}
