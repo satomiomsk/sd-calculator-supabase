@@ -277,7 +277,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                             <p>Скидка {discount.percent}%: <span className="whitespace-nowrap">{money(result.total)}</span> × {discount.percent}% = <span className="whitespace-nowrap">{money(discounted.saving)}</span></p>
                             <p className="mt-2 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span> - <span className="whitespace-nowrap">{money(discounted.saving)}</span> = <span className="whitespace-nowrap">{money(discounted.total)}</span></p>
                           </div>
-                        </>}
+                        </>)}
                         {!discount && <p className="border-t border-[#26364A]/10 pt-3 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
                       </div>
                     </details>
