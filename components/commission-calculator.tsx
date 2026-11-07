@@ -278,7 +278,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                             <p className="mt-2 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span> - <span className="whitespace-nowrap">{money(discounted.saving)}</span> = <span className="whitespace-nowrap">{money(discounted.total)}</span></p>
                           </div>
                         </>)}
-                        {!discount && !(result.rate === 0 && result.fixed > 0) && <p className="border-t border-[#26364A]/10 pt-3 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
+                        
                       </div>
                     </details>
                   </div>
