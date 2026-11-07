@@ -43,7 +43,7 @@ function MoneyInput({ id, label, value, onChange }: { id: string; label: string;
         onChange={e => {
           const raw = e.target.value;
           const digitsBeforeDecimal = raw.replace(/[ \u00a0\u202f]/g, "").split(/[.,]/)[0].replace(/^0+/, "");
-          if (digitsBeforeDecimal.length > 9) return;
+          if (digitsBeforeDecimal.length > 10) return;
           const caret = e.target.selectionStart ?? raw.length;
           const significant = raw.slice(0, caret).replace(/[ \u00a0\u202f]/g, "").length;
           const formatted = formatInput(raw);
@@ -56,7 +56,7 @@ function MoneyInput({ id, label, value, onChange }: { id: string; label: string;
         }} className="h-[68px] w-full rounded-2xl bg-transparent px-5 pr-12 text-lg font-medium tabular-nums outline-none placeholder:text-sm placeholder:font-normal placeholder:text-[#8993A2]" />
       <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-xl text-[#7B8797]">₽</span>
     </div>
-    {invalid && <p id={`${id}-error`} className="mt-2 text-sm text-[#BD302A]">Введите корректную сумму больше нуля и не более 999 999 999 ₽.</p>}
+    {value !== "" && Number(value.replace(/[\s\u00a0\u202f]/g, "")) > 999999999 ? <p id={`${id}-error`} role="alert" className="mt-2 text-sm text-[#BD302A]">Объект дороже 999 999 999 рублей? Кажется, мы нашли элитную недвижимость! 😄</p> : invalid && <p id={`${id}-error`} className="mt-2 text-sm text-[#BD302A]">Введите корректную сумму больше нуля и не более 999 999 999 ₽.</p>}
   </div>;
 }
 
